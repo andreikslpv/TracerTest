@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.tracer)
 }
 
 android {
@@ -33,10 +34,27 @@ android {
     }
     buildFeatures {
         compose = true
+        // Tracer встраивает токены через ресурсы, в AGP 9 фича выключена по умолчанию.
+        resValues = true
+    }
+}
+
+// Токены тестовые: загрузка маппинга в Tracer не выполняется, ловить нечего.
+tracer {
+    create("defaultConfig") {
+        appToken = "TEST_APP_TOKEN_0000000000000000000000000"
+        pluginToken = "TEST_PLUGIN_TOKEN_0000000000000000000000"
+        uploadMapping = true
+    }
+    create("debug") {
+        isDisabled = true
     }
 }
 
 dependencies {
+    implementation(platform(libs.tracer.platform))
+    implementation(libs.tracer.crash.report)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

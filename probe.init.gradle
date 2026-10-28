@@ -1,0 +1,18 @@
+// Диагностический init-скрипт: печатает тип Variant, который AGP передаёт плагинам,
+// и фактическое значение isMinifyEnabled.
+//
+// Запуск:
+//   ./gradlew :app:generateReleaseResValues -I probe.init.gradle --no-configuration-cache
+gradle.projectsLoaded {
+    rootProject.allprojects { p ->
+        p.plugins.withId('com.android.application') {
+            def androidComponents = p.extensions.getByName('androidComponents')
+            androidComponents.onVariants(androidComponents.selector().all(), { variant ->
+                p.logger.lifecycle(
+                    "PROBE ${variant.name} class=${variant.getClass().name} " +
+                        "minify=${variant.minifyEnabled}"
+                )
+            })
+        }
+    }
+}
